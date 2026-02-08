@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Core Colors */
+    --color-background: #0B0B0B; /* deep-black */
+    --color-foreground: #F7F5EF; /* warm-ivory */
+    --color-border: rgba(197, 165, 114, 0.2); /* champagne-gold-20 */
+    --color-input: #1A1A1A; /* surface-gray */
+    --color-ring: #C5A572; /* champagne-gold */
+    
+    /* Card Colors */
+    --color-card: #121212; /* elevated-black */
+    --color-card-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Popover Colors */
+    --color-popover: #1A1A1A; /* surface-gray */
+    --color-popover-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Muted Colors */
+    --color-muted: #1A1A1A; /* surface-gray */
+    --color-muted-foreground: #A8A29E; /* muted-beige */
+    
+    /* Primary Colors */
+    --color-primary: #C5A572; /* champagne-gold */
+    --color-primary-foreground: #0B0B0B; /* deep-black */
+    
+    /* Secondary Colors */
+    --color-secondary: #121212; /* elevated-black */
+    --color-secondary-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Destructive Colors */
+    --color-destructive: #8B2635; /* deep-burgundy */
+    --color-destructive-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Accent Colors */
+    --color-accent: #C5A572; /* champagne-gold */
+    --color-accent-foreground: #0B0B0B; /* deep-black */
+    
+    /* Success Colors */
+    --color-success: #0E3B3A; /* deep-emerald */
+    --color-success-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Warning Colors */
+    --color-warning: #B8860B; /* dark-goldenrod */
+    --color-warning-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Error Colors */
+    --color-error: #8B2635; /* deep-burgundy */
+    --color-error-foreground: #F7F5EF; /* warm-ivory */
+    
+    /* Surface Color */
+    --color-surface: #1A1A1A; /* surface-gray */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+
+  body, p, span, div, button, input, select, textarea {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .luxury-shadow {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .luxury-transition {
+    transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  .luxury-hover {
+    @apply luxury-transition hover:shadow-lg hover:shadow-black/20;
+  }
+}
