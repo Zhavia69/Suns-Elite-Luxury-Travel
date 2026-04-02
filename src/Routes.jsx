@@ -8,6 +8,7 @@ import BookingConfirmationManagement from './pages/booking-confirmation-manageme
 import ContactSupport from './pages/contact-support';
 import BookingLookup from './pages/booking-lookup';
 import Homepage from './pages/homepage';
+import HomePage from "./pages/HomePage";
 import FleetShowcase from './pages/fleet-showcase';
 
 const Routes = () => {
