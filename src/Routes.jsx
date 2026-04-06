@@ -27,7 +27,7 @@ return ( <BrowserRouter> <ErrorBoundary> <ScrollToTop /> <RouterRoutes>
       <Route path="/fleet-showcase" element={<FleetShowcase />} />
 
       {/* Optional: direct access to homepage */}
-      <Route path="/homepage" element={<HomePage />} />
+      <Route path="/homepage" element={<homepage />} />
 
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />
