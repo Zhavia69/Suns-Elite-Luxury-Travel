@@ -5,8 +5,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./pages/NotFound";
 
-// ✅ Correct imports (matches your folder structure)
-import HomePage from "./pages/homepage"; // points to homepage/index.jsx
+// ✅ IMPORTANT: This points to homepage/index.jsx
+import HomePage from "./pages/homepage";
+
 import ServiceCatalog from "./pages/service-catalog";
 import BookingConfirmationManagement from "./pages/booking-confirmation-management";
 import ContactSupport from "./pages/contact-support";
@@ -14,8 +15,9 @@ import BookingLookup from "./pages/booking-lookup";
 import FleetShowcase from "./pages/fleet-showcase";
 
 const Routes = () => {
-return ( <BrowserRouter> <ErrorBoundary> <ScrollToTop /> <RouterRoutes>
+return ( <BrowserRouter> <ErrorBoundary> <ScrollToTop />
 
+    <RouterRoutes>
       {/* ✅ MAIN LANDING PAGE */}
       <Route path="/" element={<HomePage />} />
 
@@ -26,13 +28,13 @@ return ( <BrowserRouter> <ErrorBoundary> <ScrollToTop /> <RouterRoutes>
       <Route path="/booking-lookup" element={<BookingLookup />} />
       <Route path="/fleet-showcase" element={<FleetShowcase />} />
 
-      {/* Optional: direct access to homepage */}
-      <Route path="/homepage" element={<homepage />} />
+      {/* Optional route */}
+      <Route path="/homepage" element={<HomePage />} />
 
-      {/* Catch-all route */}
+      {/* Catch-all */}
       <Route path="*" element={<NotFound />} />
-
     </RouterRoutes>
+
   </ErrorBoundary>
 </BrowserRouter>
 
