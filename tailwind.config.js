@@ -18,52 +18,62 @@ export default {
     },
     extend: {
       colors: {
-        border: "var(--color-border)", /* champagne-gold-20 */
-        input: "var(--color-input)", /* surface-gray */
-        ring: "var(--color-ring)", /* champagne-gold */
-        background: "var(--color-background)", /* deep-black */
-        foreground: "var(--color-foreground)", /* warm-ivory */
+        deepBlack: '#0A0A0A',
+        richNavy: '#112240',
+        luxuryCharcoal: '#2D2D2D',
+        gold: '#D4AF37',
+        champagne: '#F7E7CE',
+        bronze: '#B08D57',
+        softWhite: '#FDFDFD',
+        sand: '#E5E1D8',
+        neutralGray: '#7A7A7A',
+        // retained functional colors for UI states
+        border: 'var(--color-border)',
+        input: 'var(--color-input)',
+        ring: 'var(--color-ring)',
+        background: 'var(--color-background)',
+        foreground: 'var(--color-foreground)',
         primary: {
-          DEFAULT: "var(--color-primary)", /* champagne-gold */
-          foreground: "var(--color-primary-foreground)", /* deep-black */
+          DEFAULT: 'var(--color-primary)',
+          foreground: 'var(--color-primary-foreground)',
         },
         secondary: {
-          DEFAULT: "var(--color-secondary)", /* elevated-black */
-          foreground: "var(--color-secondary-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-secondary)',
+          foreground: 'var(--color-secondary-foreground)',
         },
         destructive: {
-          DEFAULT: "var(--color-destructive)", /* deep-burgundy */
-          foreground: "var(--color-destructive-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-destructive)',
+          foreground: 'var(--color-destructive-foreground)',
         },
         muted: {
-          DEFAULT: "var(--color-muted)", /* surface-gray */
-          foreground: "var(--color-muted-foreground)", /* muted-beige */
+          DEFAULT: 'var(--color-muted)',
+          foreground: 'var(--color-muted-foreground)',
         },
         accent: {
-          DEFAULT: "var(--color-accent)", /* champagne-gold */
-          foreground: "var(--color-accent-foreground)", /* deep-black */
+          DEFAULT: 'var(--color-accent)',
+          foreground: 'var(--color-accent-foreground)',
         },
         popover: {
-          DEFAULT: "var(--color-popover)", /* surface-gray */
-          foreground: "var(--color-popover-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-popover)',
+          foreground: 'var(--color-popover-foreground)',
         },
         card: {
-          DEFAULT: "var(--color-card)", /* elevated-black */
-          foreground: "var(--color-card-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-card)',
+          foreground: 'var(--color-card-foreground)',
         },
         success: {
-          DEFAULT: "var(--color-success)", /* deep-emerald */
-          foreground: "var(--color-success-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-success)',
+          foreground: 'var(--color-success-foreground)',
         },
         warning: {
-          DEFAULT: "var(--color-warning)", /* dark-goldenrod */
-          foreground: "var(--color-warning-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-warning)',
+          foreground: 'var(--color-warning-foreground)',
         },
         error: {
-          DEFAULT: "var(--color-error)", /* deep-burgundy */
-          foreground: "var(--color-error-foreground)", /* warm-ivory */
+          DEFAULT: 'var(--color-error)',
+          foreground: 'var(--color-error-foreground)',
         },
-        surface: "var(--color-surface)", /* surface-gray */
+        surface: 'var(--color-surface)',
       },
       fontFamily: {
         'heading': ['Playfair Display', 'serif'],
