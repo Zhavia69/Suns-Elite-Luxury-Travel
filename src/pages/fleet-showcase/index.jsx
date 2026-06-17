@@ -1,296 +1,207 @@
-import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet';
-import Header from '../../components/ui/Header';
-import CategoryTabs from './components/CategoryTabs';
-import FilterControls from './components/FilterControls';
-import VehicleGrid from './components/VehicleGrid';
-import FleetStats from './components/FleetStats';
-import QuickBookingWidget from '../../components/ui/QuickBookingWidget';
-import SupportWidget from '../../components/ui/SupportWidget';
-import Icon from '../../components/AppIcon';
-import Button from '../../components/ui/Button';
-import { fleetService } from '../../utils/supabaseService';
+import React, { useEffect } from "react";
+import { Helmet } from "react-helmet";
+import { motion } from "framer-motion";
+import { ArrowRight, Users, Briefcase, Wifi } from "lucide-react";
+import Header from "../../components/ui/Header";
+import MagneticButton from "../../components/ui/MagneticButton";
+
+const FLEET_COLLECTION = [
+  {
+    category: "Executive Sedans",
+    description: "The pinnacle of urban mobility. For boardroom transfers, airport arrivals, and elegant city movement.",
+    vehicles: [
+      {
+        name: "Mercedes-Benz S-Class",
+        tagline: "The benchmark of automotive prestige.",
+        image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=85&w=1920&auto=format&fit=crop",
+        passengers: "3", luggage: "3", features: ["Wi-Fi", "Massage seats", "Climate control", "Burmester audio"]
+      },
+      {
+        name: "BMW 7 Series",
+        tagline: "Precision engineering. Absolute refinement.",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=85&w=1920&auto=format&fit=crop",
+        passengers: "3", luggage: "3", features: ["Panoramic roof", "Extended legroom", "Ambient lighting"]
+      },
+      {
+        name: "Mercedes-Benz E-Class",
+        tagline: "Timeless elegance for every occasion.",
+        image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=85&w=1920&auto=format&fit=crop",
+        passengers: "3", luggage: "2", features: ["MBUX system", "Wi-Fi", "Leather interior"]
+      }
+    ]
+  },
+  {
+    category: "Luxury SUVs",
+    description: "Commanding presence combined with supreme comfort. Ideal for groups, excessive luggage, or commanding the road.",
+    vehicles: [
+      {
+        name: "Range Rover Autobiography",
+        tagline: "Above all, beyond compare.",
+        image: "https://images.unsplash.com/photo-1583267746897-2cf415887172?q=85&w=1920&auto=format&fit=crop",
+        passengers: "4", luggage: "4", features: ["Terrain response", "Meridian audio", "Heated/Cooled seats"]
+      },
+      {
+        name: "Mercedes-Benz GLS",
+        tagline: "Command presence. Exceptional comfort.",
+        image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?q=85&w=1920&auto=format&fit=crop",
+        passengers: "6", luggage: "4", features: ["Air suspension", "7 seats", "Widescreen display"]
+      },
+      {
+        name: "Toyota Land Cruiser V8",
+        tagline: "Uncompromised in any terrain.",
+        image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=85&w=1920&auto=format&fit=crop",
+        passengers: "7", luggage: "5", features: ["4WD system", "Off-road ready", "Spacious cabin"]
+      }
+    ]
+  },
+  {
+    category: "Safari Vehicles",
+    description: "Purpose-built for the Kenyan wild, without sacrificing the luxury you expect.",
+    vehicles: [
+      {
+        name: "Custom Safari Land Cruiser",
+        tagline: "Built for the bush. Crafted for comfort.",
+        image: "https://images.unsplash.com/photo-1516426122078-c23e76319801?q=85&w=1920&auto=format&fit=crop",
+        passengers: "7", luggage: "Rack", features: ["Pop-up roof", "All-terrain tyres", "Cooler box", "Radio comms"]
+      }
+    ]
+  }
+];
 
 const FleetShowcase = () => {
-  const [vehicles, setVehicles] = useState([]);
-  const [filteredVehicles, setFilteredVehicles] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    capacity: '',
-    priceRange: '',
-    sortBy: 'name'
-  });
-
-  // Mock fleet data
-  const categories = [
-    {
-      id: 'all',
-      name: 'All Vehicles',
-      description: 'Browse our complete luxury fleet collection with premium vehicles for every occasion'
-    },
-    // {
-    //   id: 'executive-sedans',
-    //   name: 'Executive Sedans',
-    //   description: 'Sophisticated sedans perfect for business meetings and airport transfers'
-    // },
-    // {
-    //   id: 'luxury-suvs',
-    //   name: 'Luxury SUVs',
-    //   description: 'Spacious and comfortable SUVs ideal for families and group travel'
-    // },
-    // {
-    //   id: 'premium-vans',
-    //   name: 'Premium Vans',
-    //   description: 'High-capacity vehicles for large groups and corporate events'
-    // },
-    // {
-    //   id: 'specialty',
-    //   name: 'Specialty Vehicles',
-    //   description: 'Unique vehicles for special occasions and VIP transportation'
-    // }
-  ];
-
-  // Fleet stats data
-  const fleetStats = [
-    { label: 'Total Vehicles', value: vehicles.length, icon: 'Car' },
-    { label: 'Available Now', value: vehicles.filter(v => v.isAvailable).length, icon: 'CheckCircle' },
-    { label: 'Vehicle Types', value: new Set(vehicles.map(v => v.type)).size, icon: 'Grid' },
-    { label: 'Years Experience', value: '15+', icon: 'Award' }
-  ];
-
   useEffect(() => {
-    loadVehicles();
+    window.scrollTo(0, 0);
   }, []);
 
-  const loadVehicles = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const data = await fleetService?.getVehicles();
-      
-      // Transform data to match existing component interface
-      const transformedVehicles = data?.map(vehicle => ({
-        id: vehicle?.id,
-        name: vehicle?.name,
-        make: vehicle?.make,
-        model: vehicle?.model,
-        year: vehicle?.year,
-        category: vehicle?.vehicle_type?.replace(/_/g, ' ')?.replace(/\b\w/g, l => l?.toUpperCase()),
-        type: vehicle?.vehicle_type,
-        capacity: vehicle?.capacity,
-        image: vehicle?.image_url,
-        features: vehicle?.features || [],
-        isAvailable: vehicle?.is_available,
-        licensePlate: vehicle?.license_plate
-      })) || [];
-
-      setVehicles(transformedVehicles);
-      setFilteredVehicles(transformedVehicles);
-    } catch (error) {
-      console.error('Error loading vehicles:', error);
-      setError(error?.message || 'Failed to load vehicles. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  const openWhatsApp = (vehicleName) => {
+    const msg = `Hello, I'd like to enquire about the ${vehicleName} from your fleet.`;
+    window.open(`https://wa.me/254743248996?text=${encodeURIComponent(msg)}`, "_blank");
   };
-
-  useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredVehicles(vehicles);
-    } else {
-      const filtered = vehicles?.filter(vehicle => 
-        vehicle?.type === selectedCategory || 
-        vehicle?.category?.toLowerCase()?.includes(selectedCategory?.toLowerCase())
-      );
-      setFilteredVehicles(filtered);
-    }
-  }, [selectedCategory, vehicles]);
-
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-  };
-
-  const handleFilterChange = (filterType, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterType]: value
-    }));
-  };
-
-  const handleClearFilters = () => {
-    setFilters({
-      capacity: '',
-      priceRange: '',
-      sortBy: 'name'
-    });
-  };
-
-  const handleVehicleSelect = (vehicle) => {
-    console.log('Selected vehicle:', vehicle);
-    // Store selected vehicle in localStorage for booking flow
-    localStorage.setItem('selected-vehicle', JSON.stringify(vehicle));
-  };
-
-  const handleBookVehicle = (vehicle) => {
-    console.log('Booking vehicle:', vehicle);
-    // Store selected vehicle in localStorage for booking flow
-    localStorage.setItem('selected-vehicle', JSON.stringify(vehicle));
-  };
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="text-red-500 mb-4">
-              <Icon name="AlertCircle" size={48} />
-            </div>
-            <h2 className="text-xl font-semibold text-foreground mb-2">Unable to Load Fleet</h2>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <button
-              onClick={loadVehicles}
-              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   return (
-    <>
+    <div className="min-h-dvh bg-[#0A0A0A]">
       <Helmet>
-        <title>Luxury Fleet Showcase - Sun's Travel | Premium Vehicles Kenya</title>
-        <meta name="description" content="Explore Sun's Travel luxury fleet featuring executive sedans, luxury SUVs, premium vans, and specialty vehicles. Professional chauffeur service in Kenya with 24/7 availability." />
-        <meta name="keywords" content="luxury vehicles Kenya, executive transport, chauffeur service, premium cars, airport transfer vehicles, corporate transport fleet" />
-        <meta property="og:title" content="Luxury Fleet Showcase - Sun's Travel" />
-        <meta property="og:description" content="Browse our premium vehicle collection for luxury transportation in Kenya" />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://sunstravel.co.ke/fleet-showcase" />
+        <title>Our Fleet — Suns Elite Luxury Travels</title>
+        <meta name="description" content="Explore our impeccable collection of executive sedans, luxury SUVs, and bespoke safari vehicles in Kenya." />
       </Helmet>
-      <div className="min-h-screen bg-background">
-        <Header />
-        
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-br from-background via-background to-muted/20 py-16 lg:py-24">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="text-center max-w-4xl mx-auto">
-              <div className="flex items-center justify-center space-x-2 mb-6">
-                <Icon name="Car" size={32} className="text-primary" />
-                <span className="text-primary font-medium">Premium Fleet</span>
-              </div>
-              <h1 className="font-heading font-semibold text-4xl lg:text-6xl text-foreground mb-6">
-                Luxury Vehicle
-                <span className="text-primary block">Collection</span>
-              </h1>
-              <p className="text-muted-foreground text-lg lg:text-xl max-w-2xl mx-auto mb-8">
-                Discover our meticulously maintained fleet of premium vehicles, each designed to provide the ultimate in comfort, safety, and sophistication for your journey.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button
-                  variant="default"
-                  size="lg"
-                  onClick={() => document.getElementById('fleet-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                  iconName="ArrowDown"
-                  iconPosition="right"
+      
+      <Header />
+
+      <main className="pt-32 lg:pt-40 pb-20">
+        <div className="luxury-container">
+          
+          {/* Page Header */}
+          <motion.div 
+            className="text-center mb-24"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="eyebrow mb-5">The Collection</p>
+            <h1 className="font-heading text-display text-warmIvory max-w-3xl mx-auto text-balance">
+              Driven by <em className="italic text-champagneGold/80">Excellence</em>
+            </h1>
+            <p className="font-body text-base text-warmIvory/50 max-w-2xl mx-auto mt-6 leading-relaxed">
+              Our fleet represents the pinnacle of automotive luxury. 
+              Meticulously maintained, flawlessly presented, and driven by 
+              professionals who understand the art of the journey.
+            </p>
+          </motion.div>
+
+          {/* Fleet Categories */}
+          <div className="space-y-24 md:space-y-32">
+            {FLEET_COLLECTION.map((category, catIndex) => (
+              <div key={category.category}>
+                {/* Category Header */}
+                <motion.div 
+                  className="mb-12 text-center md:text-left"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6 }}
                 >
-                  Browse Fleet
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => window.location.href = '/service-catalog'}
-                  iconName="Calendar"
-                  iconPosition="left"
-                >
-                  Book Now
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
+                  <div className="flex items-center gap-4 mb-4 justify-center md:justify-start">
+                    <span className="font-display text-3xl font-light text-champagneGold/30">0{catIndex + 1}</span>
+                    <h2 className="font-heading text-3xl lg:text-4xl text-warmIvory">{category.category}</h2>
+                  </div>
+                  <p className="font-body text-sm text-warmIvory/50 max-w-xl mx-auto md:mx-0">
+                    {category.description}
+                  </p>
+                  <div className="h-px w-full max-w-md bg-gradient-to-r from-champagneGold/30 to-transparent mt-8 mx-auto md:mx-0" />
+                </motion.div>
 
-        {/* Fleet Stats */}
-        <section className="py-12">
-          <div className="container mx-auto px-4 lg:px-8">
-            <FleetStats stats={fleetStats} />
-          </div>
-        </section>
+                {/* Vehicle Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {category.vehicles.map((vehicle, vIndex) => (
+                    <motion.div 
+                      key={vehicle.name}
+                      className="group border border-champagneGold/10 hover:border-champagneGold/30 bg-[#0E0E0E] transition-all duration-500 overflow-hidden"
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.6, delay: vIndex * 0.1 }}
+                    >
+                      {/* Image */}
+                      <div className="aspect-[16/10] overflow-hidden relative">
+                        <img 
+                          src={vehicle.image} 
+                          alt={vehicle.name} 
+                          className="w-full h-full object-cover transition-transform duration-700 ease-luxury group-hover:scale-[1.04]"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-transparent to-transparent opacity-60" />
+                      </div>
 
-        {/* Main Fleet Content */}
-        <section className="py-12" id="fleet-grid">
-          <div className="container mx-auto px-4 lg:px-8">
-            {/* Category Navigation */}
-            <CategoryTabs
-              categories={categories}
-              activeCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-            />
+                      {/* Content */}
+                      <div className="p-8">
+                        <h3 className="font-heading text-xl text-warmIvory mb-2">{vehicle.name}</h3>
+                        <p className="font-display italic text-sm text-champagneGold/60 mb-6">"{vehicle.tagline}"</p>
 
-            {/* Filter Controls */}
-            <FilterControls
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onClearFilters={handleClearFilters}
-              vehicleCount={filteredVehicles?.length}
-            />
+                        <div className="flex items-center gap-6 mb-6 pb-6 border-b border-champagneGold/10">
+                          <div className="flex items-center gap-2 text-[0.6rem] tracking-[0.15em] uppercase text-warmIvory/40 font-body">
+                            <Users size={12} className="text-champagneGold/70" strokeWidth={1.5} />
+                            {vehicle.passengers}
+                          </div>
+                          <div className="flex items-center gap-2 text-[0.6rem] tracking-[0.15em] uppercase text-warmIvory/40 font-body">
+                            <Briefcase size={12} className="text-champagneGold/70" strokeWidth={1.5} />
+                            {vehicle.luggage}
+                          </div>
+                          {vehicle.features.includes("Wi-Fi") && (
+                            <div className="flex items-center gap-2 text-[0.6rem] tracking-[0.15em] uppercase text-warmIvory/40 font-body">
+                              <Wifi size={12} className="text-champagneGold/70" strokeWidth={1.5} />
+                              Yes
+                            </div>
+                          )}
+                        </div>
 
-            {/* Vehicle Grid */}
-            <VehicleGrid
-              vehicles={filteredVehicles}
-              onVehicleSelect={handleVehicleSelect}
-              onBookVehicle={handleBookVehicle}
-              isLoading={isLoading}
-            />
-
-            {/* No Results */}
-            {!isLoading && filteredVehicles?.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-muted-foreground mb-4">
-                  <Icon name="Car" size={48} />
+                        <MagneticButton 
+                          onClick={() => openWhatsApp(vehicle.name)}
+                          className="w-full btn-luxury-ghost text-[0.65rem] py-3 flex items-center justify-center gap-2 group-hover:bg-champagneGold/10 group-hover:border-champagneGold/50"
+                        >
+                          Request Vehicle
+                          <ArrowRight size={12} strokeWidth={1.5} />
+                        </MagneticButton>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">No Vehicles Found</h3>
-                <p className="text-muted-foreground mb-4">
-                  No vehicles match the selected category.
-                </p>
-                <button
-                  onClick={() => setSelectedCategory('all')}
-                  className="text-primary hover:text-primary/80 luxury-transition font-medium"
-                >
-                  Show All Vehicles
-                </button>
               </div>
-            )}
+            ))}
           </div>
-        </section>
 
-        {/* Quick Booking Section */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4 lg:px-8">
-            <div className="text-center mb-8">
-              <h2 className="font-heading font-semibold text-3xl text-foreground mb-4">
-                Ready to Book?
-              </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Start your luxury journey today with our quick booking system. Select your preferred vehicle and let us handle the rest.
-              </p>
-            </div>
-            <div className="max-w-4xl mx-auto">
-              <QuickBookingWidget variant="compact" />
-            </div>
+        </div>
+      </main>
+
+      <footer className="bg-[#080808] border-t border-champagneGold/12 py-10">
+        <div className="luxury-container flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="font-display text-xl font-light tracking-[0.06em] text-warmIvory">
+            SUNS ELITE
           </div>
-        </section>
-
-        {/* Support Widget */}
-        <SupportWidget />
-      </div>
-    </>
+          <p className="text-[0.65rem] text-warmIvory/40 font-body tracking-wide">
+            © {new Date().getFullYear()} Suns Elite Luxury Travels. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 };
 

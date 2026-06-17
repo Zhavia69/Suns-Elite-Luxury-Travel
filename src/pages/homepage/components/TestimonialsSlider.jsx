@@ -1,244 +1,167 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Icon from '../../../components/AppIcon';
-import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const TESTIMONIALS = [
+  {
+    id: 1,
+    quote: "Suns Elite redefined what I thought a private transfer could be. The chauffeur was waiting with a handwritten sign, chilled water, and knowledge of every back route in Nairobi. It felt like being looked after by a personal concierge, not a driver.",
+    author: "James Whitfield",
+    title: "CEO, Whitfield Capital · London",
+    flag: "🇬🇧",
+    avatar: "J",
+  },
+  {
+    id: 2,
+    quote: "We arranged our entire Maasai Mara safari transfer through Suns Elite. The Land Cruiser was immaculate, the driver knew the roads and the wildlife patterns. Our guests — all senior executives — were incredibly impressed.",
+    author: "Amara Osei-Mensah",
+    title: "Director, Pan-African Investments · Accra",
+    flag: "🇬🇭",
+    avatar: "A",
+  },
+  {
+    id: 3,
+    quote: "As someone who travels over 200 days a year, I have high expectations. Suns Elite consistently exceeds them. The vehicles are pristine, the team is discreet, and the reliability is something I now depend on for every Nairobi visit.",
+    author: "Dr. Sofia Andersen",
+    title: "UN Advisor · Geneva",
+    flag: "🇨🇭",
+    avatar: "S",
+  },
+  {
+    id: 4,
+    quote: "The attention to detail was remarkable — from the welcome note in the vehicle to the perfectly timed airport pick-up despite my flight arriving 40 minutes early. This is what luxury service truly means.",
+    author: "Raj Mehta",
+    title: "Managing Partner, Horizon VC · Dubai",
+    flag: "🇦🇪",
+    avatar: "R",
+  },
+];
 
 const TestimonialsSlider = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const total = TESTIMONIALS.length;
 
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Oakly Quinten',
-      title: 'Client ',
-      avatar: 'https://randomuser.me/api/portraits/men/25.jpg',
-      rating: 5,
-      content: `Suns Elite Luxury Travel has been our trusted partner for diplomatic transport for over two years. Their professionalism, discretion, and punctuality are unmatched. The chauffeurs are well-trained and understand the importance of protocol.`,
-      service: 'Hourly Transportation',date: '2024-07-15'
-    },
-    {
-      id: 2,
-      name: 'Effie Aduong',
-      title: 'Client',avatar: 'https://randomuser.me/api/portraits/women/89.jpg',
-      rating: 5,
-      content: `Exceptional service from start to finish. The luxury voyage was immaculate, the chauffeur was professional, and the airport transfer was seamless. This is now our company's preferred transportation service.`,
-      service: 'Executive Airport Transfer',
-      date: '2024-07-28'
-    },
-    {
-      id: 3,
-      name: 'Cynathia Rose',
-      title: 'HRM Advisor',
-      avatar: 'https://randomuser.me/api/portraits/women/36.jpg',
-      rating: 5,
-      content: `I've used Sun's Luxury Travel for multiple within Nairobi. Their attention to detail is remarkable - from flight tracking to providing bottled water and Wi-Fi. Truly a premium experience.`,
-      service: 'Corporate Transport',
-      date: '2024-08-02'
-    },
-    {
-      id: 4,
-      name: 'Lucky Timothy',
-      title: 'Client',
-      avatar: 'https://randomuser.me/api/portraits/lego/6.jpg',
-      rating: 5,
-      content: `Our safari gateway transfer to and from the airport were absolutely perfect. The vehicle was comfortable for the long journey, and our driver shared fascinating insights about Kenya. Highly recommended!`,
-      service: 'Airport Transfer',
-      date: '2024-08-10'
-    }
-  ];
-
-  const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials?.length);
-  };
-
-  const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials?.length) % testimonials?.length);
-  };
-
-  const goToTestimonial = (index) => {
-    setCurrentIndex(index);
-  };
-
+  // Auto-advance every 6 seconds
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    const timer = setInterval(() => {
+      setDirection(1);
+      setCurrent(c => (c + 1) % total);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [total]);
 
-    const interval = setInterval(() => {
-      nextTestimonial();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, currentIndex]);
-
-  const renderStars = (rating) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Icon
-        key={i}
-        name="Star"
-        size={16}
-        className={i < rating ? 'text-primary fill-current' : 'text-muted-foreground'}
-      />
-    ));
+  const goTo = (index) => {
+    setDirection(index > current ? 1 : -1);
+    setCurrent(index);
   };
+
+  const testimonial = TESTIMONIALS[current];
 
   return (
-    <section className="pt-6 pb-16 md:pt-10 md:pb-24 bg-muted/30">
+    <section
+      className="relative bg-[#080808] overflow-hidden"
+      aria-label="Guest testimonials"
+    >
+      <hr className="luxury-divider" />
 
-      <div className="container mx-auto px-4 lg:px-8">
+      {/* ── Background large quotation mark ──────────────── */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 font-display text-[20rem] font-light text-champagneGold/[0.03] leading-none select-none pointer-events-none"
+        aria-hidden="true"
+      >
+        "
+      </div>
+
+      {/* Radial glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 50%, rgba(200,169,107,0.04) 0%, transparent 70%)' }}
+      />
+
+      <div className="luxury-container section-padding relative z-10">
+
+        {/* ── Section Header ─────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          className="text-center mb-16 lg:mb-20"
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          transition={{ duration: 0.8 }}
         >
-          <h2 className="font-heading text-3xl md:text-5xl font-semibold text-foreground mb-6">
-            Client Testimonials
+          <p className="eyebrow mb-4">Voices of Our Guests</p>
+          <h2 className="font-heading text-display text-warmIvory">
+            Trusted by the <em className="italic text-champagneGold/80">World's Best</em>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover why diplomats, executives, and discerning travelers choose Sun's Travel for their luxury transportation needs.
-          </p>
         </motion.div>
 
-        <div className="relative max-w-4xl mx-auto">
-          {/* Main Testimonial Display */}
-          <div 
-            className="relative overflow-hidden rounded-2xl bg-card border border-border shadow-luxury"
-            onMouseEnter={() => setIsAutoPlaying(false)}
-            onMouseLeave={() => setIsAutoPlaying(true)}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.5 }}
-                className="p-8 md:p-12"
-              >
-                <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
-                  {/* Avatar and Info */}
-                  <div className="flex-shrink-0 text-center md:text-left">
-                    <div className="relative inline-block">
-                      <Image
-                        src={testimonials?.[currentIndex]?.avatar}
-                        alt={testimonials?.[currentIndex]?.name}
-                        className="w-20 h-20 rounded-full object-cover border-2 border-primary/20"
-                      />
-                      <div className="absolute -bottom-2 -right-2 bg-primary rounded-full p-1">
-                        <Icon name="Quote" size={12} className="text-primary-foreground" />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <h4 className="font-heading font-semibold text-foreground">
-                        {testimonials?.[currentIndex]?.name}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {testimonials?.[currentIndex]?.title}
-                      </p>
-                      <div className="flex justify-center md:justify-start space-x-1 mt-2">
-                        {renderStars(testimonials?.[currentIndex]?.rating)}
-                      </div>
-                    </div>
-                  </div>
+        {/* ── Testimonial Carousel ────────────────────────── */}
+        <div className="max-w-4xl mx-auto">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={current}
+              custom={direction}
+              initial={{ opacity: 0, x: direction * 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -direction * 40 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center"
+            >
+              {/* Large quote mark */}
+              <div className="font-display text-6xl text-champagneGold/30 leading-none mb-6" aria-hidden="true">
+                "
+              </div>
 
-                  {/* Testimonial Content */}
-                  <div className="flex-1">
-                    <div className="mb-4">
-                      <span className="inline-block bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-medium">
-                        {testimonials?.[currentIndex]?.service}
-                      </span>
-                    </div>
-                    <blockquote className="text-foreground text-lg leading-relaxed mb-4">
-                      "{testimonials?.[currentIndex]?.content}"
-                    </blockquote>
-                    <div className="flex items-center space-x-2 text-muted-foreground text-sm">
-                      <Icon name="Calendar" size={14} />
-                      <span>
-                        {new Date(testimonials[currentIndex].date)?.toLocaleDateString('en-GB', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </span>
-                    </div>
-                  </div>
+              {/* Quote */}
+              <blockquote className="font-display text-lg md:text-xl font-light text-warmIvory/80 leading-[1.8] mb-10 text-pretty italic">
+                {testimonial.quote}
+              </blockquote>
+
+              {/* Author */}
+              <div className="flex items-center justify-center gap-5">
+                <div className="w-12 h-12 rounded-full bg-champagneGold/10 border border-champagneGold/25 flex items-center justify-center font-display text-xl text-champagneGold/70">
+                  {testimonial.avatar}
                 </div>
-              </motion.div>
-            </AnimatePresence>
+                <div className="text-left">
+                  <p className="font-body text-sm font-500 text-warmIvory">
+                    {testimonial.author} <span className="ml-1">{testimonial.flag}</span>
+                  </p>
+                  <p className="text-xs text-warmIvory/40 font-body mt-0.5">{testimonial.title}</p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* ── Progress Dots ──────────────────────────────── */}
+          <div className="flex items-center justify-center gap-3 mt-12">
+            {TESTIMONIALS.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`transition-all duration-400 ease-luxury ${
+                  i === current
+                    ? 'w-8 h-1 bg-champagneGold'
+                    : 'w-1.5 h-1.5 rounded-full bg-warmIvory/20 hover:bg-warmIvory/40'
+                }`}
+                aria-label={`View testimonial ${i + 1}`}
+                aria-current={i === current ? 'true' : undefined}
+              />
+            ))}
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex items-center justify-between mt-8">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevTestimonial}
-              className="rounded-full"
-            >
-              <Icon name="ChevronLeft" size={20} />
-            </Button>
-
-            {/* Dots Indicator */}
-            <div className="flex space-x-2">
-              {testimonials?.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToTestimonial(index)}
-                  className={`w-3 h-3 rounded-full luxury-transition ${
-                    index === currentIndex
-                      ? 'bg-primary' :'bg-muted-foreground/30 hover:bg-muted-foreground/50'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextTestimonial}
-              className="rounded-full"
-            >
-              <Icon name="ChevronRight" size={20} />
-            </Button>
+          {/* ── Auto-progress bar ─────────────────────────── */}
+          <div className="w-full h-px bg-champagneGold/10 mt-6 overflow-hidden">
+            <motion.div
+              className="h-full bg-champagneGold/50"
+              key={current}
+              initial={{ width: '0%' }}
+              animate={{ width: '100%' }}
+              transition={{ duration: 6, ease: 'linear' }}
+            />
           </div>
-
-          {/* Statistics */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
-          >
-            <div className="text-center">
-              <div className="font-heading text-2xl md:text-3xl font-semibold text-primary mb-2">
-                1000+
-              </div>
-              <p className="text-sm text-muted-foreground">Happy Clients</p>
-            </div>
-            <div className="text-center">
-              <div className="font-heading text-2xl md:text-3xl font-semibold text-primary mb-2">
-                5.0
-              </div>
-              <p className="text-sm text-muted-foreground">Average Rating</p>
-            </div>
-            <div className="text-center">
-              <div className="font-heading text-2xl md:text-3xl font-semibold text-primary mb-2">
-                24/7
-              </div>
-              <p className="text-sm text-muted-foreground">Support Available</p>
-            </div>
-            <div className="text-center">
-              <div className="font-heading text-2xl md:text-3xl font-semibold text-primary mb-2">
-                99%
-              </div>
-              <p className="text-sm text-muted-foreground">On-Time Rate</p>
-            </div>
-          </motion.div>
         </div>
       </div>
+
+      <hr className="luxury-divider" />
     </section>
   );
 };

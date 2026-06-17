@@ -1,95 +1,454 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   CSS CUSTOM PROPERTIES — LUXURY DESIGN TOKENS
+   ============================================================ */
 @layer base {
   :root {
-    /* Core Colors */
-    --color-background: #0B0B0B; /* deep-black */
-    --color-foreground: #F7F5EF; /* warm-ivory */
-    --color-border: rgba(197, 165, 114, 0.2); /* champagne-gold-20 */
-    --color-input: #1A1A1A; /* surface-gray */
-    --color-ring: #C5A572; /* champagne-gold */
-    
-    /* Card Colors */
-    --color-card: #121212; /* elevated-black */
-    --color-card-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Popover Colors */
-    --color-popover: #1A1A1A; /* surface-gray */
-    --color-popover-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Muted Colors */
-    --color-muted: #1A1A1A; /* surface-gray */
-    --color-muted-foreground: #A8A29E; /* muted-beige */
-    
-    /* Primary Colors */
-    --color-primary: #C5A572; /* champagne-gold */
-    --color-primary-foreground: #0B0B0B; /* deep-black */
-    
-    /* Secondary Colors */
-    --color-secondary: #121212; /* elevated-black */
-    --color-secondary-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Destructive Colors */
-    --color-destructive: #8B2635; /* deep-burgundy */
-    --color-destructive-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Accent Colors */
-    --color-accent: #C5A572; /* champagne-gold */
-    --color-accent-foreground: #0B0B0B; /* deep-black */
-    
-    /* Success Colors */
-    --color-success: #0E3B3A; /* deep-emerald */
-    --color-success-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Warning Colors */
-    --color-warning: #B8860B; /* dark-goldenrod */
-    --color-warning-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Error Colors */
-    --color-error: #8B2635; /* deep-burgundy */
-    --color-error-foreground: #F7F5EF; /* warm-ivory */
-    
-    /* Surface Color */
-    --color-surface: #1A1A1A; /* surface-gray */
+    /* ── Core Colors ──────────────────────────────── */
+    --color-background:         #0A0A0A;
+    --color-foreground:         #F7F5EF;
+    --color-border:             rgba(200, 169, 107, 0.18);
+    --color-input:              #1A1A1A;
+    --color-ring:               #C8A96B;
+
+    /* ── Card & Surfaces ──────────────────────────── */
+    --color-card:               #111111;
+    --color-card-foreground:    #F7F5EF;
+    --color-popover:            #1A1A1A;
+    --color-popover-foreground: #F7F5EF;
+    --color-surface:            #1A1A1A;
+
+    /* ── Muted ────────────────────────────────────── */
+    --color-muted:              #1C1C1C;
+    --color-muted-foreground:   #A8A29E;
+
+    /* ── Primary (Champagne Gold) ─────────────────── */
+    --color-primary:            #C8A96B;
+    --color-primary-foreground: #0A0A0A;
+
+    /* ── Secondary ────────────────────────────────── */
+    --color-secondary:          #1C1C1C;
+    --color-secondary-foreground: #F7F5EF;
+
+    /* ── Destructive ──────────────────────────────── */
+    --color-destructive:        #8B2635;
+    --color-destructive-foreground: #F7F5EF;
+
+    /* ── Accent ───────────────────────────────────── */
+    --color-accent:             #C8A96B;
+    --color-accent-foreground:  #0A0A0A;
+
+    /* ── Semantic States ──────────────────────────── */
+    --color-success:            #0E3B3A;
+    --color-success-foreground: #F7F5EF;
+    --color-warning:            #B8860B;
+    --color-warning-foreground: #F7F5EF;
+    --color-error:              #8B2635;
+    --color-error-foreground:   #F7F5EF;
+
+    /* ── Luxury-specific tokens ───────────────────── */
+    --gold-primary:             #C8A96B;
+    --gold-bright:              #D4AF37;
+    --gold-light:               #E8C97A;
+    --gold-dark:                #A8893A;
+    --gold-muted:               rgba(200, 169, 107, 0.15);
+
+    /* ── Motion timing ────────────────────────────── */
+    --ease-luxury:   cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth:   cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+    --duration-fast: 200ms;
+    --duration-base: 400ms;
+    --duration-slow: 800ms;
+
+    /* ── Border Radius ────────────────────────────── */
+    --radius: 0.5rem;
   }
 
-  * {
+  /* ── Global Resets ──────────────────────────────── */
+  *, *::before, *::after {
     @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+    font-size: 16px;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+  /* ── Typography Hierarchy ───────────────────────── */
+  h1 {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
   }
 
-  body, p, span, div, button, input, select, textarea {
-    font-family: 'Inter', sans-serif;
+  h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  h4, h5, h6 {
+    font-family: 'Manrope', 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  p, span, li, a, button, label, input, select, textarea {
+    font-family: 'Manrope', 'Inter', sans-serif;
+  }
+
+  .font-display {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+
+  .font-heading {
+    font-family: 'Playfair Display', Georgia, serif;
   }
 
   .font-mono {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  /* ── Selection ──────────────────────────────────── */
+  ::selection {
+    background: rgba(200, 169, 107, 0.25);
+    color: #F7F5EF;
+  }
+
+  /* ── Scrollbar ──────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0A0A0A;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(200, 169, 107, 0.4);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(200, 169, 107, 0.7);
+  }
 }
 
+/* ============================================================
+   COMPONENT LAYER — LUXURY UTILITY CLASSES
+   ============================================================ */
 @layer components {
+
+  /* ── Shadow system ──────────────────────────────── */
   .luxury-shadow {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .luxury-shadow-lg {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22), 0 16px 48px rgba(0,0,0,0.18);
+  }
+  .luxury-shadow-xl {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 24px 64px rgba(0,0,0,0.22);
+  }
+  .shadow-gold {
+    box-shadow: 0 0 24px rgba(200,169,107,0.25), 0 0 8px rgba(200,169,107,0.15);
   }
 
+  /* ── Transitions ────────────────────────────────── */
   .luxury-transition {
-    transition: all 200ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .luxury-hover {
+    @apply luxury-transition;
+  }
+  .luxury-hover:hover {
+    @apply luxury-shadow-lg;
+    transform: translateY(-2px);
   }
 
-  .luxury-hover {
-    @apply luxury-transition hover:shadow-lg hover:shadow-black/20;
+  /* ── Gold text gradient ─────────────────────────── */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #C8A96B 0%, #E8C97A 40%, #D4AF37 70%, #C8A96B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+  }
+  .text-gradient-gold-shimmer {
+    background: linear-gradient(90deg, #C8A96B 0%, #E8C97A 25%, #D4AF37 50%, #E8C97A 75%, #C8A96B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-size: 200% auto;
+    animation: gold-shimmer 4s linear infinite;
+  }
+
+  /* ── Gold divider / accent line ─────────────────── */
+  .gold-line {
+    display: block;
+    width: 3rem;
+    height: 1px;
+    background: linear-gradient(90deg, #C8A96B, #E8C97A, transparent);
+  }
+  .gold-line-center {
+    @apply gold-line;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .luxury-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,169,107,0.4), transparent);
+  }
+
+  /* ── Eyebrow text (small caps label above headings) ─ */
+  .eyebrow {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-primary);
+  }
+
+  /* ── Grain texture overlay ──────────────────────── */
+  .grain-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  /* ── Glassmorphism card ─────────────────────────── */
+  .glass-card {
+    background: rgba(17, 17, 17, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(200, 169, 107, 0.18);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .glass-card-light {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(200, 169, 107, 0.15);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  /* ── Gold border card ───────────────────────────── */
+  .gold-border {
+    border: 1px solid rgba(200,169,107,0.3);
+    transition: border-color 400ms cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow   400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .gold-border:hover {
+    border-color: rgba(200,169,107,0.7);
+    box-shadow: 0 0 24px rgba(200,169,107,0.15);
+  }
+
+  /* ── Cinematic image overlay ────────────────────── */
+  .cinematic-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(10,10,10,0.4) 0%,
+      rgba(10,10,10,0.15) 40%,
+      rgba(10,10,10,0.6) 100%
+    );
+  }
+  .cinematic-overlay-strong {
+    background: linear-gradient(
+      135deg,
+      rgba(10,10,10,0.85) 0%,
+      rgba(10,10,10,0.4) 50%,
+      rgba(10,10,10,0.65) 100%
+    );
+  }
+
+  /* ── Luxury button styles ───────────────────────── */
+  .btn-luxury-primary {
+    @apply inline-flex items-center justify-center gap-2;
+    padding: 0.875rem 2.25rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0A0A0A;
+    background: linear-gradient(135deg, #C8A96B 0%, #D4AF37 50%, #E8C97A 100%);
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-luxury-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 300ms;
+  }
+  .btn-luxury-primary:hover::after {
+    opacity: 1;
+  }
+  .btn-luxury-primary:hover {
+    box-shadow: 0 8px 32px rgba(200,169,107,0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-luxury-ghost {
+    @apply inline-flex items-center justify-center gap-2;
+    padding: 0.875rem 2.25rem;
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F7F5EF;
+    background: transparent;
+    border: 1px solid rgba(200, 169, 107, 0.5);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-luxury-ghost:hover {
+    border-color: rgba(200, 169, 107, 1);
+    background: rgba(200, 169, 107, 0.08);
+    color: #C8A96B;
+    transform: translateY(-1px);
+  }
+
+  /* ── Container ──────────────────────────────────── */
+  .luxury-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  @media (min-width: 1536px) {
+    .luxury-container {
+      max-width: 1400px;
+      padding: 0 3rem;
+    }
+  }
+
+  /* ── Section spacing ────────────────────────────── */
+  .section-padding {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 9rem;
+      padding-bottom: 9rem;
+    }
+  }
+
+  /* ── Image cinematic hover ──────────────────────── */
+  .img-cinematic {
+    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+                filter  700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .img-cinematic:hover {
+    transform: scale(1.04);
+    filter: brightness(1.05) saturate(1.1);
+  }
+  .group:hover .img-cinematic {
+    transform: scale(1.04);
+    filter: brightness(1.05) saturate(1.1);
+  }
+
+  /* ── WhatsApp green ─────────────────────────────── */
+  .whatsapp-green {
+    background-color: #25D366;
+  }
+  .whatsapp-green:hover {
+    background-color: #20BA5C;
+  }
+
+  /* ── Reduced motion ─────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================
+   UTILITY LAYER
+   ============================================================ */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+  .h-dvh {
+    height: 100dvh;
+  }
+  /* Gold shimmer animation utility */
+  @keyframes gold-shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-8px); }
+  }
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(200,169,107,0.4); }
+    50%       { box-shadow: 0 0 0 12px rgba(200,169,107,0); }
+  }
+  @keyframes chevron-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(6px); }
+  }
+  .animate-gold-shimmer {
+    animation: gold-shimmer 3s linear infinite;
+  }
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+  .animate-pulse-gold {
+    animation: pulse-gold 2s ease-in-out infinite;
+  }
+  .animate-chevron-bounce {
+    animation: chevron-bounce 1.5s ease-in-out infinite;
+  }
+  .bg-size-200 {
+    background-size: 200% auto;
   }
 }

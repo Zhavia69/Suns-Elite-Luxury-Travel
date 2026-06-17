@@ -1,264 +1,366 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, Phone, Mail, Clock, Shield, Award, CheckCircle, Lock, ChevronDown, ArrowRight } from 'lucide-react';
 import Header from '../../components/ui/Header';
-import ContactMethodCard from './components/ContactMethodCard';
-import ContactForm from './components/ContactForm';
-import FAQSection from './components/FAQSection';
-import EmergencyContact from './components/EmergencyContact';
-import BusinessHours from './components/BusinessHours';
-import SupportWidget from '../../components/ui/SupportWidget';
-import Icon from '../../components/AppIcon';
 import { contactService } from '../../utils/supabaseService';
+
+const FAQItem = ({ question, answer, isOpen, onClick }) => (
+  <div className="border-b border-champagneGold/20">
+    <button
+      onClick={onClick}
+      className="w-full py-6 flex items-center justify-between text-left group transition-colors duration-300"
+    >
+      <h4 className="font-heading text-lg md:text-xl text-warmIvory group-hover:text-champagneGold transition-colors">
+        {question}
+      </h4>
+      <div className={`ml-4 flex-shrink-0 w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'border-champagneGold text-champagneGold rotate-180' : 'border-champagneGold/20 text-warmIvory/40 group-hover:border-champagneGold/50'}`}>
+        <ChevronDown size={14} strokeWidth={1.5} />
+      </div>
+    </button>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="overflow-hidden"
+        >
+          <p className="pb-6 font-body text-sm text-warmIvory/60 leading-relaxed text-pretty">
+            {answer}
+          </p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
 
 const ContactSupport = () => {
   const [faqs, setFaqs] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [openFaq, setOpenFaq] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
-  const contactMethods = [
-    {
-      method: 'whatsapp',
-      icon: 'MessageCircle',
-      title: 'WhatsApp Business',
-      description: 'Get instant support through our WhatsApp Business account with quick responses and booking assistance.',
-      availability: 'Available 24/7',
-      response: 'Response within 5 minutes',
-      actionText: 'Start WhatsApp Chat',
-      action: () => {
-        window.open('https://wa.me/254743248996?text=Hello, I need assistance with Sun\'s Travel services', '_blank');
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Hardcode some luxury FAQs if the service fails or returns empty
+    const defaultFaqs = [
+      {
+        id: 1,
+        question: "How far in advance should I reserve my journey?",
+        answer: "For guaranteed availability, we recommend reserving your journey at least 24 hours in advance. However, our concierge team can often accommodate immediate requests within Nairobi depending on fleet positioning."
+      },
+      {
+        id: 2,
+        question: "Are your chauffeurs trained for VIP protection?",
+        answer: "Yes. All our chauffeurs undergo rigorous training in defensive driving, discretion, and executive protocol. We also offer specialized close-protection officers for clients requiring enhanced security."
+      },
+      {
+        id: 3,
+        question: "Do you operate outside of Nairobi?",
+        answer: "Absolutely. While Nairobi is our primary hub, we facilitate luxury transfers across Kenya, including bespoke safari gateways to the Maasai Mara, Amboseli, Samburu, and coastal transfers in Mombasa and Diani."
+      },
+      {
+        id: 4,
+        question: "Can I request a specific vehicle model?",
+        answer: "We always strive to accommodate specific vehicle requests from our fleet collection. Please mention your preference to our concierge when reserving, and we will confirm availability."
       }
+    ];
+    setFaqs(defaultFaqs);
+  }, []);
+
+  const handleInputChange = (e) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      if (contactService?.submitInquiry) {
+        await contactService.submitInquiry({
+          full_name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+          inquiry_type: 'general'
+        });
+      }
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setSubmitStatus(null), 5000);
+    }
+  };
+
+  const CONTACT_METHODS = [
+    {
+      title: 'WhatsApp Concierge',
+      desc: 'Instant, discreet communication directly with our team.',
+      info: '+254 743 248 996',
+      icon: MessageCircle,
+      action: () => window.open('https://wa.me/254743248996?text=Hello, I need assistance with Sun\'s Travel services', '_blank'),
+      btnText: 'Start Conversation'
     },
     {
-      method: 'phone',
-      icon: 'Phone',
-      title: 'Direct Phone Support',
-      description: 'Speak directly with our customer service representatives for personalized assistance.',
-      availability: 'Mon-Fri: 6AM-11PM, Sat-Sun: 8AM-10PM',
-      response: 'Immediate assistance',
-      actionText: 'Call Now',
-      action: () => {
-        window.location.href = 'tel:+254743248996';
-      }
+      title: 'Direct Line',
+      desc: 'Speak personally with our executive support desk.',
+      info: '+254 743 248 996',
+      icon: Phone,
+      action: () => window.location.href = 'tel:+254743248996',
+      btnText: 'Call Now'
     },
     {
-      method: 'email',
-      icon: 'Mail',
-      title: 'Email Support',
-      description: 'Send detailed inquiries and receive comprehensive responses from our support team.',
-      availability: 'Monitored 24/7',
-      response: 'Response within 2-4 hours',
-      actionText: 'Send Email',
-      action: () => {
-        window.location.href = 'mailto:sammuelryan4050@gmail.com?subject=Support Inquiry&body=Hello Sun\'s Travel Team,\n\nI need assistance with:\n\n';
-      }
-    },
-    {
-      method: 'live-chat',
-      icon: 'MessageSquare',
-      title: 'Live Chat Support',
-      description: 'Connect with our support agents through real-time chat for immediate assistance.',
-      availability: 'Business hours only',
-      response: 'Response within 2 minutes',
-      actionText: 'Start Live Chat',
-      action: () => {
-        // Mock live chat functionality
-        console.log('Live chat initiated');
-        alert('Live chat feature will be available soon. Please use WhatsApp or phone support for immediate assistance.');
-      }
+      title: 'Private Correspondence',
+      desc: 'For detailed itineraries, corporate accounts, and bespoke requests.',
+      info: 'sunsluxurytravels@gmail.com',
+      icon: Mail,
+      action: () => window.location.href = 'mailto:sunsluxurytravels@gmail.com',
+      btnText: 'Compose Email'
     }
   ];
 
-  useEffect(() => {
-    loadFAQs();
-  }, []);
-
-  const loadFAQs = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const data = await contactService?.getFAQs();
-      
-      // Transform data to match existing component interface
-      const transformedFAQs = data?.map(faq => ({
-        id: faq?.id,
-        question: faq?.question,
-        answer: faq?.answer,
-        category: faq?.category,
-        isOpen: false
-      })) || [];
-
-      setFaqs(transformedFAQs);
-    } catch (error) {
-      console.error('Error loading FAQs:', error);
-      setError(error?.message || 'Failed to load FAQs.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleContactFormSubmit = async (formData) => {
-    try {
-      await contactService?.submitInquiry({
-        full_name: formData?.name,
-        email: formData?.email,
-        phone: formData?.phone,
-        subject: formData?.subject,
-        message: formData?.message,
-        inquiry_type: formData?.inquiryType || 'general'
-      });
-
-      // Show success message
-      alert('Your inquiry has been submitted successfully. We will get back to you soon.');
-    } catch (error) {
-      console.error('Error submitting inquiry:', error);
-      alert('Failed to submit inquiry. Please try again.');
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-[#0A0A0A]">
       <Helmet>
-        <title>Contact & Support - Sun's Travel | 24/7 Customer Service</title>
-        <meta name="description" content="Get comprehensive support for your luxury travel needs. Contact Sun's Travel through WhatsApp, phone, email, or our contact form. Emergency assistance available 24/7." />
-        <meta name="keywords" content="contact support, customer service, WhatsApp support, emergency assistance, booking help, Sun's Travel Kenya" />
+        <title>At Your Service — Suns Elite Luxury Travels</title>
+        <meta name="description" content="Contact our luxury travel concierge. Available 24/7 for private airport transfers, safari journeys, and executive transport in Kenya." />
       </Helmet>
+      
       <Header />
-      <main className="container mx-auto px-4 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4">
-            <Icon name="Headphones" size={32} className="text-primary" />
+
+      <main className="pt-32 lg:pt-40 pb-20">
+        <div className="luxury-container">
+          
+          {/* ── Page Header ──────────────────────────────────────── */}
+          <motion.div 
+            className="text-center mb-24"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="eyebrow mb-5">Contact & Support</p>
+            <h1 className="font-heading text-display text-warmIvory max-w-3xl mx-auto text-balance">
+              At Your <em className="italic text-champagneGold/80">Service</em>
+            </h1>
+            <p className="font-body text-base text-warmIvory/50 max-w-xl mx-auto mt-6 leading-relaxed text-pretty">
+              Whether you are planning a complex itinerary or require an immediate transfer, 
+              our concierge desk is available 24 hours a day to assist you with absolute discretion.
+            </p>
+          </motion.div>
+
+          {/* ── Contact Methods Grid ──────────────────────────────── */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-24">
+            {CONTACT_METHODS.map((method, i) => (
+              <motion.div
+                key={method.title}
+                className="group relative bg-[#0D0D0D] border border-champagneGold/10 p-8 md:p-10 hover:border-champagneGold/30 transition-colors duration-500"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <div className="w-12 h-12 rounded-full border border-champagneGold/20 flex items-center justify-center mb-8 group-hover:border-champagneGold/50 transition-colors duration-500">
+                  <method.icon size={20} className="text-champagneGold" strokeWidth={1.5} />
+                </div>
+                <h3 className="font-heading text-xl text-warmIvory mb-3">{method.title}</h3>
+                <p className="font-body text-sm text-warmIvory/45 mb-6 leading-relaxed h-10">
+                  {method.desc}
+                </p>
+                <p className="font-display text-lg text-champagneGold mb-8">
+                  {method.info}
+                </p>
+                <button
+                  onClick={method.action}
+                  className="w-full btn-luxury-ghost text-[0.65rem] py-3.5"
+                >
+                  {method.btnText}
+                </button>
+              </motion.div>
+            ))}
           </div>
-          <h1 className="font-heading font-semibold text-4xl lg:text-5xl mb-4">
-            Contact & Support
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            We're here to assist you 24/7 with all your luxury travel needs. Choose your preferred contact method below.
-          </p>
-        </div>
 
-        {/* Emergency Contact Banner */}
-        <div className="mb-8">
-          <EmergencyContact />
-        </div>
+          <hr className="luxury-divider mb-24" />
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Contact Methods - Left Column */}
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <h2 className="font-heading font-semibold text-2xl mb-6">Get in Touch</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {contactMethods?.map((method, index) => (
-                  <ContactMethodCard
-                    key={index}
-                    {...method}
+          {/* ── Form & Info Section ──────────────────────────────── */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 mb-24">
+            
+            {/* Direct Inquiry Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="font-heading text-3xl text-warmIvory mb-4">Send an Inquiry</h2>
+              <p className="font-body text-sm text-warmIvory/50 mb-10">
+                Prefer to write to us? Submit your details below and a dedicated concierge will contact you shortly.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      name="name"
+                      required
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full bg-transparent border-b border-champagneGold/30 pb-3 text-sm font-body text-warmIvory placeholder-warmIvory/30 focus:outline-none focus:border-champagneGold transition-colors"
+                      placeholder="Full Name"
+                    />
+                  </div>
+                  <div className="relative">
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      required
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full bg-transparent border-b border-champagneGold/30 pb-3 text-sm font-body text-warmIvory placeholder-warmIvory/30 focus:outline-none focus:border-champagneGold transition-colors"
+                      placeholder="Phone Number"
+                    />
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <input 
+                    type="email" 
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full bg-transparent border-b border-champagneGold/30 pb-3 text-sm font-body text-warmIvory placeholder-warmIvory/30 focus:outline-none focus:border-champagneGold transition-colors"
+                    placeholder="Email Address"
                   />
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Contact Form */}
-            <div className="mt-8">
-              <ContactForm />
-            </div>
+                <div className="relative">
+                  <textarea 
+                    name="message"
+                    required
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    className="w-full bg-transparent border-b border-champagneGold/30 pb-3 text-sm font-body text-warmIvory placeholder-warmIvory/30 focus:outline-none focus:border-champagneGold transition-colors resize-none"
+                    placeholder="How may we assist you?"
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="btn-luxury-primary w-full md:w-auto text-xs px-10 py-4 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Send Message'}
+                  {!isSubmitting && <ArrowRight size={14} strokeWidth={1.5} />}
+                </button>
+
+                {submitStatus === 'success' && (
+                  <p className="text-sm text-champagneGold mt-4 font-body">Your inquiry has been received. We will contact you shortly.</p>
+                )}
+                {submitStatus === 'error' && (
+                  <p className="text-sm text-red-400 mt-4 font-body">There was an error sending your message. Please try WhatsApp or calling us directly.</p>
+                )}
+              </form>
+            </motion.div>
+
+            {/* Operating Standards & Trust Signals */}
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="bg-champagneGold/5 border border-champagneGold/15 p-10 md:p-12 mb-8">
+                <h3 className="font-heading text-2xl text-warmIvory mb-8">Operating Standards</h3>
+                
+                <div className="space-y-6">
+                  <div className="flex gap-4">
+                    <Clock size={18} className="text-champagneGold mt-1 flex-shrink-0" strokeWidth={1.5} />
+                    <div>
+                      <h4 className="text-sm font-body text-warmIvory mb-1">24/7 Availability</h4>
+                      <p className="text-xs text-warmIvory/50 font-body leading-relaxed">Our concierge desk and operations run 24 hours a day, 365 days a year to accommodate global flight schedules.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-4">
+                    <Shield size={18} className="text-champagneGold mt-1 flex-shrink-0" strokeWidth={1.5} />
+                    <div>
+                      <h4 className="text-sm font-body text-warmIvory mb-1">Absolute Discretion</h4>
+                      <p className="text-xs text-warmIvory/50 font-body leading-relaxed">We guarantee strict confidentiality regarding client identities, itineraries, and destinations.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Award size={18} className="text-champagneGold mt-1 flex-shrink-0" strokeWidth={1.5} />
+                    <div>
+                      <h4 className="text-sm font-body text-warmIvory mb-1">Licensed & Certified</h4>
+                      <p className="text-xs text-warmIvory/50 font-body leading-relaxed">Fully NTSA licensed, ISO 9001:2015 certified, and comprehensively insured for executive transport.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Emergency Banner */}
+              <div className="bg-[#8B2635]/10 border border-[#8B2635]/30 p-8 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#8B2635]/20 flex items-center justify-center flex-shrink-0">
+                  <Phone size={16} className="text-[#8B2635]" strokeWidth={2} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-body text-warmIvory mb-2">Emergency Response Line</h4>
+                  <p className="text-xs text-warmIvory/60 font-body mb-3">For immediate assistance during active journeys only.</p>
+                  <p className="font-display text-lg text-warmIvory">+254 743 248 996</p>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Business Hours - Right Column */}
-          <div className="space-y-6">
-            <BusinessHours />
+          <hr className="luxury-divider mb-24" />
 
-            {/* Quick Stats */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h3 className="font-heading font-semibold text-lg mb-4">Support Statistics</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Average Response Time</span>
-                  <span className="font-semibold text-success">2.3 minutes</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Customer Satisfaction</span>
-                  <span className="font-semibold text-success">98.7%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">First Contact Resolution</span>
-                  <span className="font-semibold text-success">94.2%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Languages Supported</span>
-                  <span className="font-semibold text-primary">English, Swahili</span>
-                </div>
-              </div>
+          {/* ── FAQs ──────────────────────────────────────────────── */}
+          <motion.div
+            className="max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-3xl text-warmIvory">Frequently Asked Questions</h2>
             </div>
-
-            {/* Trust Badges */}
-            <div className="bg-card border border-border rounded-lg p-6">
-              <h3 className="font-heading font-semibold text-lg mb-4">Quality Assurance</h3>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Icon name="Shield" size={16} className="text-success" />
-                  <span className="text-sm text-muted-foreground">ISO 9001:2015 Certified</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Icon name="Award" size={16} className="text-success" />
-                  <span className="text-sm text-muted-foreground">Kenya Tourism Board Licensed</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Icon name="CheckCircle" size={16} className="text-success" />
-                  <span className="text-sm text-muted-foreground">24/7 Emergency Support</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Icon name="Lock" size={16} className="text-success" />
-                  <span className="text-sm text-muted-foreground">Secure Communication</span>
-                </div>
-              </div>
+            
+            <div className="border-t border-champagneGold/20">
+              {faqs.map((faq) => (
+                <FAQItem
+                  key={faq.id}
+                  question={faq.question}
+                  answer={faq.answer}
+                  isOpen={openFaq === faq.id}
+                  onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                />
+              ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
 
-        {/* FAQ Section */}
-        <div className="mb-12">
-          <FAQSection 
-            faqs={faqs} 
-            isLoading={isLoading}
-            error={error}
-            onRetry={loadFAQs}
-          />
-        </div>
-
-        {/* Additional Support Information */}
-        <div className="bg-card border border-border rounded-lg p-8 text-center">
-          <Icon name="Heart" size={48} className="text-primary mx-auto mb-4" />
-          <h3 className="font-heading font-semibold text-2xl mb-4">
-            Committed to Excellence
-          </h3>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-            Our dedicated support team is trained to handle all aspects of luxury travel services. 
-            From booking assistance to emergency support, we're committed to providing exceptional 
-            service that exceeds your expectations.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center space-x-1">
-              <Icon name="Clock" size={16} />
-              <span>24/7 Availability</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <Icon name="Globe" size={16} />
-              <span>Multi-language Support</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <Icon name="Users" size={16} />
-              <span>Expert Team</span>
-            </span>
-            <span className="flex items-center space-x-1">
-              <Icon name="Zap" size={16} />
-              <span>Rapid Response</span>
-            </span>
-          </div>
         </div>
       </main>
-      <SupportWidget />
+
+      <footer className="bg-[#080808] border-t border-champagneGold/12 py-10">
+        <div className="luxury-container flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="font-display text-xl font-light tracking-[0.06em] text-warmIvory">
+            SUNS ELITE
+          </div>
+          <p className="text-[0.65rem] text-warmIvory/40 font-body tracking-wide">
+            © {new Date().getFullYear()} Suns Elite Luxury Travels. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
