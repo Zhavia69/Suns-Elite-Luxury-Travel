@@ -6,7 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import NotFound from "./pages/NotFound";
 
 // ✅ IMPORTANT: This points to homepage/index.jsx
-import HomePage from "./pages/homepage";
+import HomePage from "./pages/HomePage";
 
 import ServiceCatalog from "./pages/service-catalog";
 import BookingConfirmationManagement from "./pages/booking-confirmation-management";
