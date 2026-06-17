@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import Header from "../../components/ui/Header";
-import LuxuryFooter from "../HomePage/index"; // I'll refactor the footer to a separate file or just keep it simple
+import LuxuryFooter from "../homepage/index";
 
 const CATALOG_SERVICES = [
   {
